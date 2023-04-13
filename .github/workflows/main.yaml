@@ -1,0 +1,22 @@
+name: Create S3 Bucket
+on: workflow_dispatch
+jobs:
+  create-s3-bucket:
+    name: Create S3 Bucket
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@40a16ebeed7da831425b665e600750cb36b38d06
+      - name: Set UUID
+        id: generate-uuid
+        uses: filipstefansson/uuid-action@ce29ebbb0981ac2448c2e406e848bfaa30ddf04c
+        with:
+          name: ${{ github.sha }}
+      - name: Get the UUID -> Bucket Name
+        run: echo "UUID is ${{ steps.generate-uuid.outputs.uuid }}"
+      - name: Upload to S3
+        run: |
+          aws s3 mb s3://${{ steps.generate-uuid.outputs.uuid }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
